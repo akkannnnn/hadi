@@ -1,0 +1,16 @@
+{
+    "tekli_ders_f_size": 11,
+    "tekli_ogr_f_size": 10,
+    "tekli_snf_f_size": 11,
+    "dortlu_ders_f_size": 8,
+    "dortlu_ogr_f_size": 8,
+    "dortlu_snf_f_size": 8,
+    "tekli_row_h": 65,
+    "dortlu_row_h": 30,
+    "tekli_sutun_genislik": 26,
+    "dortlu_sutun_genislik": 12,
+    "gun_f_size": 9,
+    "saat_f_size": 7,
+    "gun_row_h": 15,
+    "saat_col_w": 12
+}

@@ -1,0 +1,50 @@
+{
+    "zaman_ayarlari": {
+        "baslama": "09:15",
+        "ders_dk": 40,
+        "teneffus_dk": 10,
+        "ogle_sonrasi_ders": 4,
+        "ogle_dk": 50,
+        "ozel_saatler": {
+            "1": "1. Saat (09:15 - 09:55)",
+            "2": "2. Saat (10:05 - 10:45)",
+            "3": "3. Saat (10:55 - 11:35)",
+            "4": "4. Saat (11:45 - 12:25)",
+            "5": "5. Saat (13:15 - 13:55)",
+            "6": "6. Saat (14:05 - 14:45)",
+            "7": "7. Saat (14:55 - 15:35)",
+            "8": "8. Saat (15:45 - 16:25)"
+        },
+        "gunler": [
+            "Pazartesi",
+            "Salı",
+            "Çarşamba",
+            "Perşembe",
+            "Cuma"
+        ],
+        "ders_sayisi": 8,
+        "gun_saatleri": {}
+    },
+    "ogretmen_izinleri": {
+        "Ahmet AYDIN": [],
+        "Ayşegül ÖZLEN": [],
+        "Ahmet Burak ÜLKER": [],
+        "Öznur Özgür İÇ": []
+    },
+    "sinif_izinleri": {
+        "AL-9A": [],
+        "AL-10D": [],
+        "AL-10B": [],
+        "AL-11C": []
+    },
+    "gelismis_ayarlar": {
+        "blok_stratejisi": "ikili",
+        "gun_yayilimi": true,
+        "ardisiklik_boslugu": 0,
+        "ogr_snf_gunluk_limit": false,
+        "gunluk_max_blok": false,
+        "yogun_ders_egilimi": "yok",
+        "yogun_ders_saat_esigi": 10,
+        "ders_iliskileri": []
+    }
+}

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Akkan AI — Program Görüntüleyici</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.kontrol{display:flex;align-items:center;gap:7px;padding:8px 14px;
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.gbtn{padding:5px 13px;border-radius:var(--radius-s);border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:12px;font-weight:500;transition:all .13s;white-space:nowrap}
+.gbtn.on{border-color:var(--blue);color:var(--blue);background:rgba(142,202,230,.1)}
+.gbtn:hover:not(.on){color:var(--text);border-color:var(--muted)}
+.ana{flex:1;overflow:auto;padding:14px}
+
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px}
+.prog-kart{break-inside:avoid}
+.prog-kart h3{font-size:12px;padding:6px 10px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-s) var(--radius-s) 0 0;
+  border-bottom:none;font-family:'Syne',sans-serif;color:var(--text);
+  display:flex;align-items:center;justify-content:space-between}
+.prog-kart h3 .pdf-btn{font-size:10px;padding:2px 8px;border-radius:4px;
+  border:1px solid var(--border);background:transparent;color:var(--muted);
+  cursor:pointer;transition:all .12s}
+.prog-kart h3 .pdf-btn:hover{border-color:var(--blue);color:var(--blue)}
+.prog-tbl{border-collapse:collapse;width:100%;font-size:10px;table-layout:fixed}
+.prog-tbl th{background:var(--card);color:var(--blue);padding:4px 7px;
+  border:1px solid var(--border);text-align:center;font-size:11px;font-weight:600;white-space:nowrap}
+.prog-tbl th.sth{color:var(--muted);text-align:left;width:95px}
+.prog-tbl td{border:1px solid var(--border);text-align:center;vertical-align:middle;
+  height:48px;font-size:12px;font-weight:600;color:#1a2230;padding:0;line-height:1.3;
+  position:relative;overflow:hidden}
+.prog-tbl td.bos{background:var(--card)}
+.prog-tbl td.std{background:var(--card);color:var(--text);font-weight:600;
+  text-align:left;padding:4px 6px 4px 10px;font-size:12px;
+  vertical-align:middle;line-height:1.4;width:95px;white-space:normal;overflow:hidden}
+.prog-tbl td > .hc{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:3px 5px;overflow:hidden;
+  gap:1px;box-sizing:border-box;width:100%}
+.prog-tbl td > .hc small{font-size:10px;font-weight:500;opacity:.85;line-height:1.2}
+
+.genel-wrap{overflow-x:auto}
+.genel-tbl{border-collapse:collapse;font-size:10px}
+.genel-tbl th{background:var(--card);color:var(--blue);padding:4px 5px;
+  border:1px solid var(--border);text-align:center;font-size:9px;font-weight:600;
+  position:sticky;top:0;z-index:5;white-space:nowrap}
+.genel-tbl th.gth{color:var(--orange);font-weight:700}
+.genel-tbl th.ksr{border-right:2px solid rgba(255,255,255,.25)}
+.genel-tbl td{border:1px solid var(--border);text-align:center;font-size:9px;
+  font-weight:600;color:#1a2230;height:22px;min-width:36px;padding:1px 3px}
+.genel-tbl td.itd{background:var(--card);color:var(--text);font-size:10px;font-weight:700;
+  text-align:left;padding:2px 9px;position:sticky;left:0;z-index:3;white-space:nowrap;min-width:100px}
+.genel-tbl td.bos{background:var(--card)}
+.genel-tbl td.ksr{border-right:2px solid rgba(255,255,255,.25)}
+
+.musait-tbl{border-collapse:collapse;width:100%;font-size:11px}
+.musait-tbl th{background:var(--card);color:var(--blue);padding:5px 8px;
+  border:1px solid var(--border);text-align:center;font-size:10px;font-weight:600}
+.musait-tbl th.gth{color:var(--orange);text-align:left}
+.musait-tbl td{border:1px solid var(--border);padding:5px 7px;vertical-align:top;font-size:10px}
+.musait-tbl td.gtd{color:var(--orange);font-weight:700;background:rgba(235,203,139,.07)}
+.pill{display:inline-block;background:rgba(163,190,140,.14);color:var(--green);
+  border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600;margin:1px}
+.kalan-banner{margin-top:14px;padding:11px 14px;
+  background:rgba(235,203,139,.08);border:1px solid rgba(235,203,139,.3);border-radius:var(--radius-s)}
+.kalan-banner .kb-baslik{color:var(--orange);font-weight:700;font-size:12px;margin-bottom:7px}
+.kalan-pill{display:inline-block;background:rgba(235,203,139,.15);
+  border:1px solid rgba(202,138,4,.4);border-radius:99px;
+  padding:2px 9px;font-size:10px;color:#ca8a04;margin:2px}
+.cikti-btn{padding:3px 10px;border-radius:4px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;font-size:11px;
+  transition:all .12s;white-space:nowrap}
+.cikti-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── MODAL & AYARLAR CSS ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.modal-kutu{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:640px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-height:90vh;overflow-y:auto;}
+.modal-kutu h3{color:var(--blue);margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:10px;font-size:16px;}
+.ayar-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:14px;margin-bottom:20px;}
+.ayar-item{display:flex;flex-direction:column;gap:6px;}
+.ayar-item label{font-size:11px;font-weight:600;color:var(--muted);}
+.ayar-item input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:13px;width:100%;}
+.btn-grup{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
+
+@media print{
+  .topbar,.kontrol,.modal-bg{display:none!important}
+  body,html{overflow:visible;height:auto}
+  .ana{overflow:visible;height:auto}
+  .prog-kart{page-break-after:always}
+  .prog-kart h3 .pdf-btn{display:none}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="btn btn-ghost btn-sm" onclick="git('index.html')">← Ana Menü</button>
+  <h2>📋 Program Görüntüleyici</h2>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost btn-sm" onclick="git('duzenleme.html')">✏️ Düzenle</button>
+  
+  <button class="btn btn-ghost btn-sm" onclick="ayarModalAc()" style="color:var(--orange);border-color:var(--orange)">⚙️ Excel Ayarları</button>
+  
+  <button class="btn btn-blue btn-sm"  onclick="excelIndir(false)">⬇️ Renkli Excel</button>
+  <button class="btn btn-ghost btn-sm" onclick="excelIndir(true)">⬇️ Siyah-Beyaz</button>
+  <button class="btn btn-red btn-sm"   onclick="pdfTumunuIndir()">📄 Tümünü İndir</button>
+  <button class="btn btn-ghost btn-sm" onclick="goruntuyuYazdir()">🖨️ Görüneni Yazdır</button>
+</div>
+<div class="kontrol">
+  <button class="gbtn on" id="gb-sinif"  onclick="gorunum('sinif')">🏫 Sınıf</button>
+  <button class="gbtn"    id="gb-ogr"    onclick="gorunum('ogretmen')">👤 Öğretmen</button>
+  <button class="gbtn"    id="gb-gsnf"   onclick="gorunum('gsinif')">📊 Genel Sınıf</button>
+  <button class="gbtn"    id="gb-gogr"   onclick="gorunum('gogr')">📊 Genel Öğretmen</button>
+  <button class="gbtn"    id="gb-musait" onclick="gorunum('musait')">✅ Müsait</button>
+  <div class="spacer"></div>
+  <button class="cikti-btn" onclick="goruntuyuYazdir()">🖨️ Görüneni Yazdır</button>
+  <input type="text" id="filtre" placeholder="🔍 Filtrele..." oninput="renderGorunum()" style="width:150px"/>
+</div>
+<div class="ana" id="ana">
+  <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:10px">
+    <div class="spin"></div>Yükleniyor…
+  </div>
+</div>
+
+<div class="modal-bg" id="ayar-modal" style="display:none;">
+  <div class="modal-kutu">
+    <h3>⚙️ Excel Çıktı ve Biçimlendirme Ayarları</h3>
+    
+    <div style="color:var(--green);font-weight:bold;font-size:13px;margin-bottom:10px;">📄 TEKLİ SAYFALAR (1 Sınıf / Öğretmen)</div>
+    <div class="ayar-grid">
+      <div class="ayar-item"><label>Ders Adı (Punto)</label><input type="number" id="ay-tekli-ders" /></div>
+      <div class="ayar-item"><label>Sınıf Adı (Punto)</label><input type="number" id="ay-tekli-snf" /></div>
+      <div class="ayar-item"><label>Öğretmen Adı (Punto)</label><input type="number" id="ay-tekli-ogr" /></div>
+      <div class="ayar-item"><label>Satır Yüksekliği</label><input type="number" id="ay-tekli-satir" /></div>
+      <div class="ayar-item"><label>Sütun Genişliği</label><input type="number" id="ay-tekli-sutun" /></div>
+    </div>
+    
+    <div style="color:var(--purple);font-weight:bold;font-size:13px;margin-top:10px;margin-bottom:10px;">🗂️ 4'LÜ SAYFALAR (Kağıda 4 Adet)</div>
+    <div class="ayar-grid">
+      <div class="ayar-item"><label>Ders Adı (Punto)</label><input type="number" id="ay-dortlu-ders" /></div>
+      <div class="ayar-item"><label>Sınıf Adı (Punto)</label><input type="number" id="ay-dortlu-snf" /></div>
+      <div class="ayar-item"><label>Öğretmen Adı (Punto)</label><input type="number" id="ay-dortlu-ogr" /></div>
+      <div class="ayar-item"><label>Satır Yüksekliği</label><input type="number" id="ay-dortlu-satir" /></div>
+      <div class="ayar-item"><label>Sütun Genişliği</label><input type="number" id="ay-dortlu-sutun" /></div>
+    </div>
+
+    <div class="btn-grup">
+      <button class="btn btn-red btn-sm" onclick="sifirlaAyarlar()">Varsayılana Dön</button>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ayar-modal').style.display='none'">İptal</button>
+      <button class="btn btn-blue btn-sm" onclick="kaydetAyarlar()">Ayarları Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div id="notif-wrap"></div>
+<script src="assets/app.js"></script>
+<script>
+let GUNLER=["Pazartesi","Salı","Çarşamba","Perşembe","Cuma"];
+let DERS_SAYISI=8;
+let GUN_SAATLERI={};
+let prog={},kalan=[],sinifList=[],ogretmenList=[],saatEt={},ogretmenIzin={},dersYuku=[];
+let aktif="sinif";
+const GB={sinif:"gb-sinif",ogretmen:"gb-ogr",gsinif:"gb-gsnf",gogr:"gb-gogr",musait:"gb-musait"};
+
+async function yukle(){
+  try{
+    const v=await api.get("/api/program/veri");
+    prog=v.program;kalan=v.kalan||[];sinifList=v.sinif_listesi||[];
+    ogretmenList=v.ogretmen_listesi||[];saatEt=v.aktif_saat_etiketleri||{};
+    ogretmenIzin=v.ogretmen_izinleri||{};
+    if(v.gunler&&v.gunler.length)GUNLER=v.gunler;
+    if(v.ders_sayisi)DERS_SAYISI=v.ders_sayisi;
+    if(v.gun_saatleri)GUN_SAATLERI=v.gun_saatleri;
+    try{const dy=await api.get("/api/ders-yuku");dersYuku=dy.satirlar||[];}catch(e){}
+    renderGorunum();
+    ayarlarYukle(); // Ayarları arka planda hazırla
+  }catch(err){
+    document.getElementById("ana").innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--muted)">
+        <div style="font-size:44px">📭</div><p>Program henüz oluşturulmadı.</p>
+        <button class="btn btn-green" onclick="git('index.html')">Ana Menüye Dön</button>
+      </div>`;
+  }
+}
+
+function gorunum(tip){
+  aktif=tip;
+  document.querySelectorAll(".gbtn").forEach(b=>b.classList.remove("on"));
+  if(GB[tip])document.getElementById(GB[tip]).classList.add("on");
+  renderGorunum();
+}
+
+function renderGorunum(){
+  const q=(document.getElementById("filtre")?.value||"").toLowerCase().trim();
+  const el=document.getElementById("ana");el.innerHTML="";
+  if(!prog||!sinifList.length)return;
+  if(aktif==="sinif")         renderTekli(el,sinifList,false,q);
+  else if(aktif==="ogretmen") renderTekli(el,ogretmenList,true,q);
+  else if(aktif==="gsinif")   renderGenel(el,false,q);
+  else if(aktif==="gogr")     renderGenel(el,true,q);
+  else if(aktif==="musait")   renderMusait(el,q);
+}
+
+/* ── Ortak yardımcılar ── */
+function birlesikGrupla(g,s){
+  const grup={};
+  sinifList.forEach(snf=>{
+    const h=prog[g]?.[s]?.[snf];
+    if(!h)return;
+    const key=(h.task_id!=null)?`t${h.task_id}`:`${h.ders}||${h.ogretmen}`;
+    (grup[key]=grup[key]||{h,snflar:[]}).snflar.push(snf);
+  });
+  return grup;
+}
+
+function birlesikSinifEtiketi(g,s,snf){
+  const h=prog[g]?.[s]?.[snf];
+  if(!h)return snf;
+  const grup=birlesikGrupla(g,s);
+  for(const k in grup){
+    if(grup[k].snflar.includes(snf))return grup[k].snflar.join("+");
+  }
+  return snf;
+}
+
+function ogrData(){
+  const d={};
+  ogretmenList.forEach(o=>{d[o]={};for(let g=0;g<5;g++)d[o][g]={};});
+  for(let g=0;g<GUNLER.length;g++){
+    for(let s=1;s<=DERS_SAYISI;s++){
+      const grup=birlesikGrupla(g,s);
+      Object.values(grup).forEach(({h,snflar})=>{
+        const birlesik=snflar.join("+");
+        h.ogretmen.split("+").map(o=>o.trim()).forEach(o=>{
+          if(o in d)d[o][g][s]={ders:h.ders,sinif:birlesik};
+        });
+      });
+    }
+  }
+  return d;
+}
+
+function hRenk(ogr){
+  if(!ogr)return null;
+  const o=ogr.split("+")[0].trim();
+  const i=ogretmenList.indexOf(o);
+  if(i<0)return"#a0c4e8";
+  const h=(i/Math.max(ogretmenList.length,1))*320;
+  const s=0.42,l=0.72;
+  const c2=(1-Math.abs(2*l-1))*s;
+  const x=c2*(1-Math.abs((h/60)%2-1));
+  const m=l-c2/2;
+  const hi=Math.floor(h/60)%6;
+  const map=[[c2,x,0],[x,c2,0],[0,c2,x],[0,x,c2],[x,0,c2],[c2,0,x]];
+  const[r0,g0,b0]=map[hi];
+  const r=Math.round((r0+m)*255),g=Math.round((g0+m)*255),b=Math.round((b0+m)*255);
+  return`rgb(${r},${g},${b})`;
+}
+
+function basH(str){
+  if(!str)return"";
+  return str.split("+").map(o=>{
+    o=o.trim();
+    if(!o)return"";
+    const p=o.split(" ").filter(Boolean);
+    if(p.length===1)return p[0];
+    return p[0][0].toUpperCase()+"."+p.slice(1).join(" ");
+  }).join("+");
+}
+function sEt(s){return saatEt[String(s)]||`${s}. Saat`;}
+
+/* ── Excel Ayarları Mimarisi ── */
+function ayarModalAc() {
+  document.getElementById('ayar-modal').style.display='flex';
+}
+
+function formuDoldur(ayar) {
+  document.getElementById("ay-tekli-ders").value = ayar.tekli_ders_f_size;
+  document.getElementById("ay-tekli-snf").value  = ayar.tekli_snf_f_size;
+  document.getElementById("ay-tekli-ogr").value  = ayar.tekli_ogr_f_size;
+  document.getElementById("ay-tekli-satir").value = ayar.tekli_row_h;
+  document.getElementById("ay-tekli-sutun").value = ayar.tekli_sutun_genislik;
+
+  document.getElementById("ay-dortlu-ders").value = ayar.dortlu_ders_f_size;
+  document.getElementById("ay-dortlu-snf").value  = ayar.dortlu_snf_f_size;
+  document.getElementById("ay-dortlu-ogr").value  = ayar.dortlu_ogr_f_size;
+  document.getElementById("ay-dortlu-satir").value = ayar.dortlu_row_h;
+  document.getElementById("ay-dortlu-sutun").value = ayar.dortlu_sutun_genislik;
+}
+
+async function ayarlarYukle() {
+  try {
+    const res = await api.get("/api/ayarlar/excel");
+    formuDoldur(res);
+  } catch (e) {
+    console.log("Ayarlar çekilemedi:", e);
+  }
+}
+
+async function kaydetAyarlar() {
+  const payload = {
+    tekli_ders_f_size: parseInt(document.getElementById("ay-tekli-ders").value),
+    tekli_snf_f_size:  parseInt(document.getElementById("ay-tekli-snf").value),
+    tekli_ogr_f_size:  parseInt(document.getElementById("ay-tekli-ogr").value),
+    tekli_row_h:       parseInt(document.getElementById("ay-tekli-satir").value),
+    tekli_sutun_genislik: parseInt(document.getElementById("ay-tekli-sutun").value),
+
+    dortlu_ders_f_size: parseInt(document.getElementById("ay-dortlu-ders").value),
+    dortlu_snf_f_size:  parseInt(document.getElementById("ay-dortlu-snf").value),
+    dortlu_ogr_f_size:  parseInt(document.getElementById("ay-dortlu-ogr").value),
+    dortlu_row_h:       parseInt(document.getElementById("ay-dortlu-satir").value),
+    dortlu_sutun_genislik: parseInt(document.getElementById("ay-dortlu-sutun").value)
+  };
+  try {
+    await api.post("/api/ayarlar/excel", payload);
+    bildir("✅ Excel ayarları başarıyla kaydedildi.", "basari");
+    document.getElementById('ayar-modal').style.display='none';
+  } catch (e) {
+    bildir("Hata: " + e.message, "hata");
+  }
+}
+
+async function sifirlaAyarlar() {
+  if(!confirm("Tüm Excel ayarlarını ilk orijinal değerlerine döndürmek istiyor musunuz?")) return;
+  try {
+    const res = await api.post("/api/ayarlar/excel/varsayilan");
+    formuDoldur(res.ayarlar);
+    bildir("✅ " + res.mesaj, "basari");
+  } catch (e) {
+    bildir("Hata: " + e.message, "hata");
+  }
+}
+
+async function excelIndir(sb){
+  try{await api.download("/api/excel-ciktisi",{siyah_beyaz:sb},"akkan_program.xlsx");bildir("Excel indiriliyor…","basari");}
+  catch(err){bildir(err.message,"hata");}
+}
+
+/* ── Yazdırma ve Render (Daha önceki mevcut kodlar) ── */
+function goruntuyuYazdir(){
+  const w=window.open("","_blank");
+  if(!w)return;
+  const icerik=document.getElementById("ana").innerHTML;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+    <title>Akkan AI — Çıktı</title>
+    <style>
+      @page{size:A4 landscape;margin:6mm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
+      body{font-family:Arial,sans-serif;margin:0;padding:4px;background:#fff;color:#1a2230}
+      h3{font-size:10px;margin:0;padding:4px 8px;background:#1E3A5F;color:#F0F4FF;border-radius:3px 3px 0 0;display:flex;align-items:center;justify-content:space-between;border:1.5px solid #1E3A5F;border-bottom:none}
+      h3 button{display:none}
+      .prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px}
+      .prog-kart{margin:0;page-break-inside:avoid;border:1.5px solid #1E3A5F;border-radius:3px;overflow:hidden}
+      .prog-kart h3{border:none;border-radius:0}
+      table{border-collapse:collapse;width:100%;font-size:8px;table-layout:fixed}
+      th{background:#2B3A52;color:#8ECAE6;padding:3px 4px;border:1.5px solid #1E3A5F;text-align:center;font-size:8px;font-weight:700}
+      th.sth{color:#CBD5E1;text-align:left;width:52px;border-right:2px solid #F0F4FF}
+      td{border:1.5px solid #334155;text-align:center;vertical-align:middle;height:26px;font-size:8px;font-weight:600;color:#1a2230;padding:0;position:relative;overflow:hidden}
+      td.bos{background:#F4F7FB}
+      td.std{background:#E8EEF6;color:#1E3A5F;text-align:center;padding:2px;width:52px;font-weight:600;line-height:1.15;border-right:2px solid #1E3A5F}
+      td.std *{font-size:7px!important;color:#1E3A5F!important;font-weight:700}
+      td.std br+*{font-size:6px!important;font-weight:500!important;opacity:.85}
+      td > .hc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;gap:1px;box-sizing:border-box;line-height:1.15;width:100%}
+      .pdf-btn,.yazdir-btn,.cikti-btn{display:none}
+      .genel-wrap{overflow:visible}
+      .genel-tbl{table-layout:fixed;width:100%}
+      .genel-tbl td{border:1.5px solid #334155;font-size:6px;height:12px;padding:1px}
+      .genel-tbl th{border:1.5px solid #1E3A5F;font-size:6px;padding:1px}
+      .genel-tbl td.itd{position:static;background:#E8EEF6;color:#1E3A5F;font-size:7px;font-weight:700;padding:2px 5px}
+      .musait-tbl{table-layout:auto}
+      .musait-tbl td,.musait-tbl th{border:1.5px solid #334155;padding:3px 4px;font-size:7px}
+      .musait-tbl td.gtd{font-size:8px}
+      .pill{display:inline-block;background:rgba(163,190,140,.35);color:#1a4a2e;border-radius:99px;padding:0 4px;font-size:6.5px;font-weight:600;margin:1px 0}
+      .kalan-banner{margin:8px 4px;padding:6px 10px;background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:3px;page-break-inside:avoid}
+      .kb-baslik{color:#92400E;font-weight:700;font-size:9px;margin-bottom:4px}
+      .kalan-pill{display:inline-block;background:#FEF3C7;border:1px solid #FCD34D;border-radius:99px;padding:1px 6px;font-size:7px;color:#92400E;margin:1px}
+    </style></head><body>
+    ${icerik}
+    <script>window.onload=()=>{window.print();}<\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+function pdfTumunuIndir(){
+  const w=window.open("","_blank");
+  if(!w){bildir("Pop-up'lara izin verin.","uyari");return;}
+  const oD=ogrData();
+  const nG=GUNLER.length, nS=DERS_SAYISI;
+
+  function gunBas(g){const gs=GUN_SAATLERI[GUNLER[g]];return(gs&&gs.ozel)?gs.baslama:null;}
+  function cogunluk(){
+    const say={};
+    for(let g=0;g<nG;g++){const b=gunBas(g)||"ortak";say[b]=(say[b]||0)+1;}
+    return Object.entries(say).sort((a,b)=>b[1]-a[1])[0]?.[0]||"ortak";
+  }
+  const cog=cogunluk();
+
+  function farkliFooter(){
+    const f=[];
+    for(let g=0;g<nG;g++){
+      const b=gunBas(g);
+      if(b&&b!==cog){
+        const gs=GUN_SAATLERI[GUNLER[g]];
+        const saatler=[];
+        let t=new Date("2000-01-01T"+b);
+        const dk=gs.ders_dk||40,ten=gs.teneffus_dk||10,odk=gs.ogle_dk||50,ono=gs.ogle_sonrasi||4;
+        for(let s=1;s<=nS;s++){
+          const bit=new Date(t.getTime()+dk*60000);
+          saatler.push(`${s}→${t.getHours().toString().padStart(2,"0")}:${t.getMinutes().toString().padStart(2,"0")}`);
+          t=new Date(bit.getTime()+(s===ono?odk:ten)*60000);
+        }
+        f.push(`<b>${GUNLER[g]}:</b> ${saatler.join(" · ")}`);
+      }
+    }
+    if(!f.length)return"";
+    return`<div style="background:#FEF3C7;border-top:1px solid #FCD34D;padding:4px 10px;font-size:7px;color:#92400E">
+      <b>Farklı saatler: </b>${f.join(" &nbsp;|&nbsp; ")}</div>`;
+  }
+
+  function gunTh(g){
+    const b=gunBas(g);const fark=b&&b!==cog;
+    return`<th style="background:#2B3A52;color:${fark?"#FCD34D":"#8ECAE6"};font-size:7px;font-weight:600;padding:3px 4px;border:1px solid #475569;text-align:center">${GUNLER[g]}${fark?`<br><span style="font-size:6px">${b}</span>`:""}</th>`;
+  }
+
+  function hRenkI(ogr){
+    if(!ogr||!ogretmenList.length)return"#a0c4e8";
+    const o=ogr.split("+")[0].trim();const i=ogretmenList.indexOf(o);if(i<0)return"#a0c4e8";
+    const h=(i/Math.max(ogretmenList.length,1))*320,s=0.42,l=0.72;
+    const c2=(1-Math.abs(2*l-1))*s,x=c2*(1-Math.abs((h/60)%2-1)),m=l-c2/2;
+    const hi=Math.floor(h/60)%6,mp=[[c2,x,0],[x,c2,0],[0,c2,x],[0,x,c2],[x,0,c2],[c2,0,x]];
+    const[r0,g0,b0]=mp[hi];
+    return`rgb(${Math.round((r0+m)*255)},${Math.round((g0+m)*255)},${Math.round((b0+m)*255)})`;
+  }
+  function bH(s){
+    if(!s)return"";
+    return s.split("+").map(o=>{
+      o=o.trim();if(!o)return"";
+      const p=o.split(" ").filter(Boolean);
+      if(p.length===1)return p[0];
+      return p[0][0].toUpperCase()+"."+p.slice(1).join(" ");
+    }).join("+");
+  }
+  function sL(s){return(saatEt[String(s)]||`${s}. Saat`).replace(/\n/g," ");}
+  function saatTd(s,small){
+    const et=saatEt[String(s)]||`${s}. Saat`;
+    const p=et.split(/\n|\(/).map(x=>x.replace(")","").trim()).filter(Boolean);
+    return`<td style="background:#E8EEF6;color:#475569;font-weight:400;text-align:left;padding:2px 4px;border:1px solid #CBD5E1;font-size:${small?"6px":"7px"};white-space:nowrap">
+      <b style="color:#1E3A5F">${p[0]||s+". Saat"}</b>${p[1]?`<br><span style="font-size:${small?"5px":"6px"}">(${p[1]})</span>`:""}</td>`;
+  }
+
+  const css=`
+    @page{size:A4 landscape;margin:5mm}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;margin:0;padding:0;background:#fff;color:#1a2230}
+    .sayfa{page-break-after:always;page-break-inside:avoid;
+      width:287mm;height:200mm;padding:0;display:flex;flex-direction:column;overflow:hidden}
+    .bolum-baslik{font-size:10px;font-weight:700;margin:0 0 3px;padding:3px 8px;
+      background:#2B3A52;color:#F0F4FF;border-radius:3px;flex-shrink:0}
+    .kart{display:flex;flex-direction:column;border:1px solid #CBD5E1;
+      border-radius:3px;overflow:hidden;flex:1;min-height:0}
+    .kart-baslik{font-size:9px;font-weight:700;padding:3px 8px;background:#2B3A52;
+      color:#F0F4FF;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+    .kart table{border-collapse:collapse;width:100%;table-layout:fixed;flex:1}
+    .kart thead th{background:#E8EEF6;color:#1E3A5F;padding:3px 3px;border:1.5px solid #1E3A5F;
+      font-size:7px;font-weight:700;text-align:center;overflow:hidden}
+    .kart thead th.sth{text-align:left;width:60px;border-right:2px solid #1E3A5F}
+    .kart tbody td{border:1.5px solid #334155;text-align:center;vertical-align:middle;
+      font-weight:600;color:#1a2230;padding:0;overflow:hidden;font-size:8px;
+      position:relative;height:1px}
+    .kart tbody td.saat-td{background:#E8EEF6;color:#1E3A5F;font-weight:600;
+      text-align:center;padding:2px 3px;font-size:7px;width:60px;
+      border-right:2px solid #1E3A5F;line-height:1.2}
+    .kart tbody td.bos{background:#F4F7FB}
+    .kart tbody td > .hc{position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:2px;overflow:hidden;
+      gap:1px;box-sizing:border-box;line-height:1.2;width:100%}
+    .dortlu-grid{display:grid;grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;gap:4px;flex:1;overflow:hidden;min-height:0}
+    .dortlu-grid .kart tbody td{font-size:6.5px}
+    .dortlu-grid .kart-baslik{font-size:8px;padding:2px 6px}
+    .dortlu-grid .kart thead th{font-size:6px}
+    .dortlu-grid .kart tbody td.saat-td{font-size:6px;width:48px}
+    .dortlu-grid .kart thead th.sth{width:48px}`;
+
+  function kartHTML2(item, isT, tam){
+    let ts=0;
+    if(isT)for(let g=0;g<nG;g++)for(let s=1;s<=nS;s++)if(oD[item]?.[g]?.[s])ts++;
+    const gunBasliklari=Array.from({length:nG},(_,g)=>{
+      const b=gunBas(g);const fark=b&&b!==cog;
+      return`<th style="text-align:center;color:${fark?"#92400E":"#475569"}">${GUNLER[g]}</th>`;
+    }).join("");
+    let rows="";
+    for(let s=1;s<=nS;s++){
+      const et=saatEt[String(s)]||`${s}. Saat`;
+      const p=et.split(/\n|\(/).map(x=>x.replace(")","").trim()).filter(Boolean);
+      const saatMetni=`<b>${p[0]||s+". Saat"}</b>${p[1]?`<br>(${p[1]})`:""}`; 
+      rows+=`<tr><td class="saat-td">${saatMetni}</td>`;
+      for(let g=0;g<nG;g++){
+        const d=isT?oD[item]?.[g]?.[s]:prog[g]?.[s]?.[item];
+        if(d){
+          const r=hRenkI(isT?item:d.ogretmen);
+          let ic;
+          if(isT){
+            ic=`${d.sinif}<br><span style="opacity:.85">${tam?d.ders:d.ders.slice(0,12)}</span>`;
+          }else{
+            const etk=birlesikSinifEtiketi(g,s,item);
+            const digerler=etk.split("+").filter(x=>x!==item);
+            const ek=digerler.length?` <span style="color:#92400E;font-weight:700">(+${digerler.join(",")})</span>`:"";
+            ic=`${tam?d.ders:d.ders.slice(0,12)}${ek}<br><span style="opacity:.85">${bH(d.ogretmen)}</span>`;
+          }
+          rows+=`<td style="background:${r}"><div class="hc">${ic}</div></td>`;
+        }else rows+=`<td class="bos"></td>`;
+      }
+      rows+="</tr>";
+    }
+    const ff=farkliFooter();
+    return`<div class="kart">
+      <div class="kart-baslik">
+        <span>${isT?"👤 ":"🏫 "}${item}</span>
+        ${isT?`<span style="font-size:8px;color:#8ECAE6">${ts} saat</span>`:""}
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+        <table>
+          <thead><tr><th class="sth">Saat</th>${gunBasliklari}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${ff}
+      </div>
+    </div>`;
+  }
+
+  function genelHTML(liste,isT){
+    const ts={};
+    if(isT)liste.forEach(o=>{let t=0;for(let g=0;g<nG;g++)for(let s=1;s<=nS;s++)if(oD[o]?.[g]?.[s])t++;ts[o]=t;});
+    const gunCols=Array.from({length:nG},(_,g)=>`<th colspan="${nS}" style="background:#1E3A5F;color:#8ECAE6;font-size:7px;border:1px solid #475569;border-right:2px solid #F0F4FF">${GUNLER[g]}</th>`).join("");
+    const saatCols=Array.from({length:nG*nS},(_,i)=>{
+      const sonSaat=((i+1)%nS===0 && i<nG*nS-1);
+      return`<th style="font-size:6px;padding:1px;border:1px solid #475569;${sonSaat?'border-right:2px solid #F0F4FF;':''}background:#2B3A52;color:#8ECAE6">${(i%nS)+1}</th>`;
+    }).join("");
+    const rows=liste.map(item=>{
+      let r=`<tr><td style="background:#E8EEF6;font-weight:700;font-size:7px;border:1px solid #475569;padding:2px 5px;white-space:nowrap;color:#1E3A5F">${item}</td>`;
+      if(isT)r+=`<td style="background:#E8EEF6;font-size:7px;font-weight:700;text-align:center;border:1px solid #475569;color:#1E3A5F">${ts[item]||0}s</td>`;
+      for(let g=0;g<nG;g++)for(let s=1;s<=nS;s++){
+        const d=isT?oD[item]?.[g]?.[s]:prog[g]?.[s]?.[item];
+        const sonSaat=(s===nS && g<nG-1);
+        const brd=`border:1px solid #64748B${sonSaat?';border-right:2px solid #1E3A5F':''}`;
+        if(d){const r2=hRenkI(isT?item:d.ogretmen);
+          let v;
+          if(isT){
+            v=(d.sinif||"").slice(0,4);
+          }else{
+            const etk=birlesikSinifEtiketi(g,s,item);
+            const digerler=etk.split("+").filter(x=>x!==item);
+            const temel=(d.ders||"").slice(0,5);
+            v=digerler.length?`${temel}*`:temel;
+          }
+          r+=`<td style="background:${r2};font-size:6px;font-weight:700;${brd};text-align:center;height:13px;overflow:hidden">${v}</td>`;}
+        else r+=`<td style="background:#F4F7FB;${brd};height:13px"></td>`;
+      }
+      return r+`</tr>`;
+    }).join("");
+    const topT=isT?`<th style="width:22px;background:#1a3a5f;color:#8ECAE6;font-size:7px;border:1px solid #475569">Top.</th>`:"";
+    return`<div class="sayfa">
+      <div class="bolum-baslik">${isT?"📊 Genel Öğretmen":"📊 Genel Sınıf"}</div>
+      <div style="flex:1;overflow:hidden">
+        <table style="border-collapse:collapse;width:100%;table-layout:fixed">
+          <thead>
+            <tr><th style="width:${isT?'70px':'60px'};background:#2B3A52;color:#8ECAE6;font-size:7px;border:1px solid #475569">${isT?"Öğretmen":"Sınıf"}</th>${topT}${gunCols}</tr>
+            <tr><th style="background:#2B3A52;border:1px solid #475569"></th>${isT?`<th style="border:1px solid #475569;background:#2B3A52"></th>`:""}${saatCols}</tr>
+          </thead><tbody>${rows}</tbody></table>
+      </div>${farkliFooter()}</div>`;
+  }
+
+  function musaitHTML(){
+    const dolu={};
+    for(let g=0;g<nG;g++){dolu[g]={};for(let s=1;s<=nS;s++)dolu[g][s]=new Set();}
+    sinifList.forEach(snf=>{for(let g=0;g<nG;g++)for(let s=1;s<=nS;s++){const h=prog[g]?.[s]?.[snf];if(h)h.ogretmen.split("+").forEach(o=>dolu[g][s].add(o.trim()));}});
+    const ogrDV=new Set();
+    dersYuku.forEach(s=>{const o=String(s["Ogretmen"]||s["Öğretmen"]||"");o.split("+").forEach(x=>{x=x.trim();if(x&&x!=="nan")ogrDV.add(x);});});
+    const fil=ogretmenList.filter(o=>ogrDV.has(o));
+    let rows="";
+    GUNLER.forEach((gun,g)=>{
+      rows+=`<tr><td style="font-weight:700;color:#92400E;background:#FEF3C7;white-space:nowrap;border:1px solid #475569;padding:4px 6px;font-size:8px;vertical-align:top">${gun}</td>`;
+      for(let s=1;s<=nS;s++){
+        const m=fil.filter(o=>{if((ogretmenIzin[o]||[]).some(iz=>iz[0]===s&&iz[1]===g))return false;return!dolu[g][s].has(o);});
+        rows+=m.length?`<td style="border:1px solid #64748B;padding:3px 4px;vertical-align:top;font-size:6.5px;line-height:1.55;color:#1a4a2e">${m.map(o=>`<span style="white-space:nowrap;font-weight:600">${o}</span>`).join(' <span style="color:#94A3B8">•</span> ')}</td>`
+          :`<td style="color:#94A3B8;text-align:center;border:1px solid #64748B;font-size:7px">—</td>`;
+      }
+      rows+="</tr>";
+    });
+    return`<div class="sayfa"><div class="bolum-baslik">✅ Müsait Öğretmenler</div>
+      <table style="border-collapse:collapse;width:100%;table-layout:fixed">
+        <thead><tr><th style="background:#2B3A52;color:#8ECAE6;padding:3px 6px;border:1px solid #475569;font-size:7px;width:55px">Gün</th>
+        ${Array.from({length:nS},(_,i)=>`<th style="background:#2B3A52;color:#8ECAE6;padding:3px 4px;border:1px solid #475569;font-size:7px">${sL(i+1)}</th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody></table></div>`;
+  }
+
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Akkan AI</title><style>${css}</style></head><body>`;
+  sinifList.forEach((snf,i)=>{
+    html+=`<div class="sayfa">${i===0?`<div class="bolum-baslik">🏫 Sınıf Programları</div>`:""}${kartHTML2(snf,false,true)}</div>`;
+  });
+  ogretmenList.forEach((ogr,i)=>{
+    html+=`<div class="sayfa">${i===0?`<div class="bolum-baslik">👤 Öğretmen Programları</div>`:""}${kartHTML2(ogr,true,true)}</div>`;
+  });
+  for(let i=0;i<sinifList.length;i+=4){
+    html+=`<div class="sayfa">${i===0?`<div class="bolum-baslik">🏫 Sınıf (4'lü)</div>`:""}<div class="dortlu-grid">${sinifList.slice(i,i+4).map(x=>kartHTML2(x,false)).join("")}</div></div>`;
+  }
+  for(let i=0;i<ogretmenList.length;i+=4){
+    html+=`<div class="sayfa">${i===0?`<div class="bolum-baslik">👤 Öğretmen (4'lü)</div>`:""}<div class="dortlu-grid">${ogretmenList.slice(i,i+4).map(x=>kartHTML2(x,true)).join("")}</div></div>`;
+  }
+
+  html+=genelHTML(sinifList,false);
+  html+=genelHTML(ogretmenList,true);
+  html+=musaitHTML();
+  html+=`<script>window.onload=()=>{window.print();}<\/script></body></html>`;
+  w.document.write(html);w.document.close();
+}
+
+function renderTekli(el,liste,isT,q){
+  const f=liste.filter(i=>i.toLowerCase().includes(q));
+  if(!f.length){el.innerHTML='<p style="color:var(--muted)">Sonuç bulunamadı.</p>';return;}
+  const oD=isT?ogrData():null;
+  const grid=document.createElement("div");grid.className="prog-grid";
+  f.forEach(item=>{
+    const div=document.createElement("div");div.className="prog-kart";
+    let rows="";
+    for(let s=1;s<=8;s++){
+      const saatMetni=sEt(s);
+      const satirlar=saatMetni.split(/\n|\(/).map(x=>x.replace(')','').trim()).filter(Boolean);
+      const satir1=satirlar[0]||`${s}. Saat`;
+      const satir2=satirlar[1]?`<span style="font-size:8px;color:var(--muted);font-weight:400">(${satirlar[1]})</span>`:"";
+      rows+=`<tr><td class="std"><span style="font-size:10px;font-weight:700;color:var(--blue)">${satir1}</span>${satir2?"<br>"+satir2:""}</td>`;
+      for(let g=0;g<5;g++){
+        const d=isT?oD[item]?.[g]?.[s]:prog[g]?.[s]?.[item];
+        if(d){
+          const renk=isT?hRenk(item):hRenk(d.ogretmen);
+          let ic;
+          if(isT){
+            ic=`${d.sinif}<br><small>${d.ders.slice(0,12)}</small>`;
+          }else{
+            const etk=birlesikSinifEtiketi(g,s,item);
+            const digerler=etk.split("+").filter(x=>x!==item);
+            const birlesikEk=digerler.length?` <span style="color:var(--orange);font-weight:700">(+${digerler.join(",")})</span>`:"";
+            ic=`${d.ders.slice(0,12)}${birlesikEk}<br><small>${basH(d.ogretmen)}</small>`;
+          }
+          rows+=`<td style="background:${renk}"><div class="hc">${ic}</div></td>`;
+        }else rows+=`<td class="bos"></td>`;
+      }
+      rows+="</tr>";
+    }
+    div.innerHTML=`
+      <h3><span>${isT?"👤 ":"🏫 "}${item}</span>
+        <button class="pdf-btn" onclick="pdfTekKart('${item.replace(/'/g,"\\'")}',${isT})">📄 PDF</button>
+      </h3>
+      <table class="prog-tbl">
+        <thead><tr><th class="sth">Saat</th>${GUNLER.map(g=>`<th>${g}</th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    grid.appendChild(div);
+  });
+  el.appendChild(grid);
+  if(!isT&&kalan.length){
+    const kb=document.createElement("div");kb.className="kalan-banner";
+    kb.innerHTML=`<div class="kb-baslik">⚠️ Yerleştirilemeyen Dersler (${kalan.length})</div>
+      ${kalan.map(d=>`<span class="kalan-pill">${d.sinif} · ${d.ders} · ${basH(d.ogretmen)}</span>`).join("")}`;
+    el.appendChild(kb);
+  }
+}
+
+function pdfTekKart(item,isT){
+  const w=window.open("","_blank");if(!w)return;
+  const oD=isT?ogrData():null;
+  let rows="";
+  for(let s=1;s<=8;s++){
+    rows+=`<tr><td class="std">${sEt(s).replace(/\n/g,"<br>")}</td>`;
+    for(let g=0;g<5;g++){
+      const d=isT?oD[item]?.[g]?.[s]:prog[g]?.[s]?.[item];
+      if(d){
+        const renk=hRenk(isT?item:d.ogretmen);
+        let ic;
+        if(isT){
+          ic=`${d.sinif}<br><small>${d.ders.slice(0,14)}</small>`;
+        }else{
+          const etk=birlesikSinifEtiketi(g,s,item);
+          const digerler=etk.split("+").filter(x=>x!==item);
+          const birlesikEk=digerler.length?` (+${digerler.join(",")})`:"";
+          ic=`${d.ders.slice(0,14)}${birlesikEk}<br><small>${basH(d.ogretmen)}</small>`;
+        }
+        rows+=`<td style="background:${renk};height:38px">${ic}</td>`;
+      }else rows+=`<td class="bos" style="height:38px"></td>`;
+    }
+    rows+="</tr>";
+  }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+    <title>${item}</title>
+    <style>
+      @page{size:A4 landscape;margin:6mm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
+      body{font-family:Arial,sans-serif;margin:0;padding:0;background:#fff;color:#1a2230}
+      h3{font-size:10px;margin:0;padding:4px 8px;background:#2B3A52;color:#F0F4FF;border-radius:3px 3px 0 0;display:flex;align-items:center;justify-content:space-between}
+      h3 button{display:none}
+      .prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px}
+      .prog-kart{margin:0;page-break-inside:avoid;border:1px solid #475569;border-radius:3px;overflow:hidden}
+      table{border-collapse:collapse;width:100%;font-size:8px;table-layout:fixed}
+      th{background:#2B3A52;color:#8ECAE6;padding:3px 4px;border:1px solid #475569;text-align:center;font-size:8px;font-weight:700}
+      th.sth{color:#CBD5E1;text-align:left;width:52px;border-right:2px solid #F0F4FF}
+      td{border:1px solid #64748B;text-align:center;vertical-align:middle;height:26px;font-size:8px;font-weight:600;color:#1a2230;padding:0;position:relative;overflow:hidden}
+      td.bos{background:#F4F7FB}
+      td.std{background:#E8EEF6;color:#1E3A5F;text-align:center;padding:2px;width:52px;font-weight:600;line-height:1.15;border-right:2px solid #1E3A5F}
+      td.std *{font-size:7px!important;color:#1E3A5F!important;font-weight:700}
+      td.std br+*{font-size:6px!important;font-weight:500!important;opacity:.85}
+      td > .hc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;gap:1px;box-sizing:border-box;line-height:1.15}
+      .pdf-btn,.yazdir-btn,.cikti-btn{display:none}
+      .genel-wrap{overflow:visible}
+      .genel-tbl{table-layout:fixed;width:100%}
+      .genel-tbl td{border:1px solid #64748B;font-size:6px;height:12px;padding:1px}
+      .genel-tbl th{border:1px solid #475569;font-size:6px;padding:1px}
+      .genel-tbl td.itd{position:static;background:#E8EEF6;color:#1E3A5F;font-size:7px;font-weight:700;padding:2px 5px}
+      .musait-tbl{table-layout:auto}
+      .musait-tbl td,.musait-tbl th{border:1px solid #475569;padding:3px 4px;font-size:7px}
+      .musait-tbl td.gtd{font-size:8px}
+      .pill{display:inline-block;background:rgba(163,190,140,.35);color:#1a4a2e;border-radius:99px;padding:0 4px;font-size:6.5px;font-weight:600;margin:1px 0}
+      .kalan-banner{margin:8px 4px;padding:6px 10px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:3px;page-break-inside:avoid}
+      .kb-baslik{color:#92400E;font-weight:700;font-size:9px;margin-bottom:4px}
+      .kalan-pill{display:inline-block;background:#FEF3C7;border:1px solid #FCD34D;border-radius:99px;padding:1px 6px;font-size:7px;color:#92400E;margin:1px}
+    </style></head><body>
+    <h2>${isT?"👤 ":"🏫 "}${item}</h2>
+    <table><thead><tr><th class="sth">Saat</th>${GUNLER.map(g=>`<th>${g}</th>`).join("")}</tr></thead>
+    <tbody>${rows}</tbody></table>
+    <script>window.onload=()=>{window.print();}<\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+function renderGenel(el,isT,q){
+  const oD=isT?ogrData():null;
+  const liste=(isT?ogretmenList:sinifList).filter(i=>i.toLowerCase().includes(q));
+  if(!liste.length){el.innerHTML='<p style="color:var(--muted)">Sonuç bulunamadı.</p>';return;}
+
+  const toplamSaat={};
+  if(isT&&oD){
+    liste.forEach(ogr=>{
+      let t=0;
+      for(let g=0;g<5;g++)for(let s=1;s<=8;s++)if(oD[ogr]?.[g]?.[s])t++;
+      toplamSaat[ogr]=t;
+    });
+  }
+
+  const wrap=document.createElement("div");wrap.className="genel-wrap";
+  const tbl=document.createElement("table");tbl.className="genel-tbl";
+  let r1=`<tr><th rowspan="2" style="position:sticky;left:0;z-index:6;min-width:${isT?'140px':'100px'}">${isT?"Öğretmen":"Sınıf"}</th>`;
+  GUNLER.forEach((gun,gi)=>r1+=`<th class="gth${gi<4?" ksr":""}" colspan="8">${gun}</th>`);
+  r1+=`</tr><tr>`;
+  for(let g=0;g<5;g++)for(let s=1;s<=8;s++)r1+=`<th class="${s===8&&g<4?"ksr":""}">${s}</th>`;
+  r1+=`</tr>`;
+  tbl.innerHTML=`<thead>${r1}</thead>`;
+  const tbody=document.createElement("tbody");
+  liste.forEach(item=>{
+    const tr=document.createElement("tr");
+    const isimLabel=isT
+      ?`${item} <span style="color:var(--blue);font-size:9px;font-weight:700">(${toplamSaat[item]||0})</span>`
+      :item;
+    let h=`<td class="itd">${isimLabel}</td>`;
+    for(let g=0;g<GUNLER.length;g++)for(let s=1;s<=DERS_SAYISI;s++){
+      const d=isT?oD[item]?.[g]?.[s]:prog[g]?.[s]?.[item];
+      const cls=s===8&&g<4?"ksr":"";
+      if(d){
+        const renk=isT?hRenk(item):hRenk(d.ogretmen);
+        const val=isT?(d.sinif||"").slice(0,5):(d.ders||"").slice(0,6);
+        h+=`<td class="${cls}" style="background:${renk}">${val}</td>`;
+      }else h+=`<td class="bos ${cls}"></td>`;
+    }
+    tr.innerHTML=h;tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);wrap.appendChild(tbl);el.appendChild(wrap);
+}
+
+function renderMusait(el,q){
+  const dolu={};
+  for(let g=0;g<5;g++){dolu[g]={};for(let s=1;s<=8;s++)dolu[g][s]=new Set();}
+  sinifList.forEach(snf=>{
+    for(let g=0;g<GUNLER.length;g++)for(let s=1;s<=DERS_SAYISI;s++){
+      const h=prog[g]?.[s]?.[snf];
+      if(h)h.ogretmen.split("+").forEach(o=>dolu[g][s].add(o.trim()));
+    }
+  });
+  const ogrDersVar=new Set();
+  dersYuku.forEach(s=>{
+    const ogr=String(s["Ogretmen"]||s["Öğretmen"]||s["ogretmen"]||"");
+    ogr.split("+").forEach(x=>{x=x.trim();if(x&&x!=="nan")ogrDersVar.add(x);});
+  });
+  const filtreli=ogretmenList.filter(o=>{
+    if(q&&!o.toLowerCase().includes(q))return false;
+    return ogrDersVar.has(o);
+  });
+  const tbl=document.createElement("table");tbl.className="musait-tbl";
+  let th=`<thead><tr><th class="gth" style="min-width:90px">Gün</th>`;
+  for(let s=1;s<=8;s++)th+=`<th>${sEt(s).replace("\n","<br>")}</th>`;
+  th+=`</tr></thead>`;
+  tbl.innerHTML=th;
+  const tbody=document.createElement("tbody");
+  GUNLER.forEach((gun,g)=>{
+    const tr=document.createElement("tr");
+    let h=`<td class="gtd">${gun}</td>`;
+    for(let s=1;s<=8;s++){
+      const m=filtreli.filter(o=>{
+        if((ogretmenIzin[o]||[]).some(iz=>iz[0]===s&&iz[1]===g))return false;
+        return!dolu[g][s].has(o);
+      });
+      h+=m.length
+        ?`<td>${m.map(o=>`<span class="pill">${o}</span>`).join("")}</td>`
+        :`<td style="color:var(--muted);text-align:center">—</td>`;
+    }
+    tr.innerHTML=h;tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);el.appendChild(tbl);
+}
+
+yukle();
+</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+{
+    "sinif:9A:0_3": {
+        "isim": "9A",
+        "gun": 0,
+        "saat": 3,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Ahmet AYDIN + Salih Toprak"
+    },
+    "ogretmen:Ahmet AYDIN:0_3": {
+        "isim": "Ahmet AYDIN",
+        "gun": 0,
+        "saat": 3,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "ogretmen:Salih Toprak:0_3": {
+        "isim": "Salih Toprak",
+        "gun": 0,
+        "saat": 3,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "sinif:9A:0_4": {
+        "isim": "9A",
+        "gun": 0,
+        "saat": 4,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Ahmet AYDIN + Salih Toprak"
+    },
+    "sinif:FEN/9:0_4": {
+        "isim": "FEN/9",
+        "gun": 0,
+        "saat": 4,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Ahmet AYDIN + Salih Toprak"
+    },
+    "ogretmen:Ahmet AYDIN:0_4": {
+        "isim": "Ahmet AYDIN",
+        "gun": 0,
+        "saat": 4,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "ogretmen:Salih Toprak:0_4": {
+        "isim": "Salih Toprak",
+        "gun": 0,
+        "saat": 4,
+        "ders": "Beden Eğitimi/Müzik",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "sinif:9A:1_1": {
+        "isim": "9A",
+        "gun": 1,
+        "saat": 1,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "sinif:FEN/9:1_1": {
+        "isim": "FEN/9",
+        "gun": 1,
+        "saat": 1,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "ogretmen:Fatma DELİVELİ:1_1": {
+        "isim": "Fatma DELİVELİ",
+        "gun": 1,
+        "saat": 1,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "ogretmen:Mustafa DOĞAN:1_1": {
+        "isim": "Mustafa DOĞAN",
+        "gun": 1,
+        "saat": 1,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "sinif:9A:1_2": {
+        "isim": "9A",
+        "gun": 1,
+        "saat": 2,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "ogretmen:Fatma DELİVELİ:1_2": {
+        "isim": "Fatma DELİVELİ",
+        "gun": 1,
+        "saat": 2,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "ogretmen:Mustafa DOĞAN:1_2": {
+        "isim": "Mustafa DOĞAN",
+        "gun": 1,
+        "saat": 2,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "9A",
+            "FEN/9"
+        ]
+    },
+    "sinif:FEN/10:1_3": {
+        "isim": "FEN/10",
+        "gun": 1,
+        "saat": 3,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "ogretmen:Fatma DELİVELİ:1_3": {
+        "isim": "Fatma DELİVELİ",
+        "gun": 1,
+        "saat": 3,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ]
+    },
+    "ogretmen:Mustafa DOĞAN:1_3": {
+        "isim": "Mustafa DOĞAN",
+        "gun": 1,
+        "saat": 3,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ]
+    },
+    "sinif:10A:1_4": {
+        "isim": "10A",
+        "gun": 1,
+        "saat": 4,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "sinif:FEN/10:1_4": {
+        "isim": "FEN/10",
+        "gun": 1,
+        "saat": 4,
+        "ders": "İngilizce",
+        "tip": "sinif",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ],
+        "kilitliOgr": "Fatma DELİVELİ + Mustafa DOĞAN"
+    },
+    "ogretmen:Fatma DELİVELİ:1_4": {
+        "isim": "Fatma DELİVELİ",
+        "gun": 1,
+        "saat": 4,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ]
+    },
+    "ogretmen:Mustafa DOĞAN:1_4": {
+        "isim": "Mustafa DOĞAN",
+        "gun": 1,
+        "saat": 4,
+        "ders": "İngilizce",
+        "tip": "ogretmen",
+        "siniflar": [
+            "10A",
+            "FEN/10"
+        ]
+    }
+}

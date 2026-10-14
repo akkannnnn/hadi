@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Akkan AI — Ders Programı</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.hero{text-align:center;padding:20px 20px 10px;flex-shrink:0}
+.hero-logo{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin:0 0 4px;letter-spacing:-.02em}
+.hero .alt{font-size:12px;color:var(--muted)}
+.aksiyon{display:flex;justify-content:center;gap:10px;padding:0 20px 12px;flex-shrink:0}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 44px;
+  max-width:860px;margin:0 auto;width:100%;flex-shrink:0}
+.mkart{background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+  padding:26px 22px;cursor:pointer;transition:border-color .18s,transform .14s,box-shadow .18s;
+  display:flex;flex-direction:column;gap:9px;position:relative;overflow:hidden}
+.mkart::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+.mkart.mavi::before{background:var(--blue)}.mkart.turuncu::before{background:var(--orange)}
+.mkart.mor::before{background:var(--purple)}.mkart.yesil::before{background:var(--green)}
+.mkart:hover{border-color:var(--muted);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.mkart .no{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.45}
+.mkart .ikon{font-size:30px}.mkart h3{font-size:1.05rem;color:var(--text)}
+.mkart p{font-size:12px;color:var(--muted);margin:0}
+.mkart.dis{opacity:.38;cursor:not-allowed;transform:none!important}
+.mkart.yukleniyor h3{color:var(--orange)}
+.sure-wrap{display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:10px 44px 0;max-width:860px;margin:0 auto;width:100%;flex-shrink:0}
+.sure-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.sure-btn{padding:8px 20px;border-radius:10px;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:600;transition:all .13s;white-space:nowrap;
+  text-align:center;line-height:1.6;min-width:100px}
+.sure-btn.on{border-color:var(--green);color:var(--green);background:rgba(163,190,140,.12)}
+.sure-btn:hover:not(.on){border-color:var(--muted);color:var(--text)}
+.sure-ozel{display:flex;align-items:center;gap:5px}
+.sure-ozel input{width:56px;padding:4px 7px;font-size:11px;text-align:center}
+.sure-ozel span{font-size:11px;color:var(--muted)}
+.prog-wrap2{padding:0 44px;max-width:860px;margin:8px auto 0;width:100%;flex-shrink:0}
+.sayac{text-align:center;font-size:13px;color:var(--blue);margin-top:6px;font-weight:600;letter-spacing:.02em}
+.duz-wrap{text-align:center;padding:14px 20px 0;flex-shrink:0}
+.uyari-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;
+  align-items:center;justify-content:center;z-index:2000;animation:fadeIn .2s ease}
+.uyari-kutu{background:var(--card);border:1.5px solid var(--orange);border-radius:16px;
+  padding:28px;max-width:600px;width:94vw;box-shadow:0 0 40px rgba(235,203,139,.15)}
+.uyari-kutu h3{color:var(--orange);margin-bottom:14px}
+.uyari-liste{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:300px;overflow-y:auto}
+.u-item{padding:9px 12px;border-radius:8px;font-size:12px;line-height:1.5}
+.u-item.hata{background:rgba(191,97,106,.12);border:1px solid rgba(191,97,106,.4);color:#e8a0a5}
+.u-item.bilgi{background:rgba(235,203,139,.09);border:1px solid rgba(235,203,139,.3);color:var(--orange)}
+.u-bold{font-weight:700}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-logo">AKKAN AI</div>
+  <span class="alt">Ders Programı Hazırlama Motoru</span>
+</div>
+<div class="aksiyon">
+  <button class="btn btn-ghost-blue btn-sm" onclick="projeKaydet()">💾 Projeyi Kaydet</button>
+  <button class="btn btn-ghost-green btn-sm" onclick="document.getElementById('prj-in').click()">📂 Projeyi Yükle</button>
+  <input id="prj-in" type="file" accept=".enderun" class="hidden" onchange="projeYukle(this)"/>
+  <div style="display:flex;gap:2px;background:rgba(255,255,255,.07);border-radius:7px;padding:2px;margin-left:4px">
+    <button id="tema-karanlik" onclick="temaDegistir('karanlik')"
+      style="border:none;border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;background:var(--card);color:var(--text)">🌙</button>
+    <button id="tema-acik" onclick="temaDegistir('acik')"
+      style="border:none;border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted)">☀️</button>
+    <button id="tema-mavi" onclick="temaDegistir('mavi')"
+      style="border:none;border-radius:5px;padding:3px 9px;font-size:12px;cursor:pointer;background:transparent;color:var(--muted)">🌊</button>
+  </div>
+</div>
+<div class="menu-grid">
+  <div class="mkart mavi" onclick="git('excel.html')">
+    <div class="no">Adım 1</div><div class="ikon">📊</div>
+    <h3>Excel Yükle</h3><p>Ders yükü tablosunu içe aktar ve düzenle</p>
+  </div>
+  <div class="mkart turuncu" onclick="git('kisitlama.html')">
+    <div class="no">Adım 2</div><div class="ikon">🔒</div>
+    <h3>Sınıf / Öğretmen Kısıtlama</h3><p>İzinli saatler, kapalı günler, ekleme/silme</p>
+  </div>
+  <div class="mkart mor" onclick="git('veri.html')">
+    <div class="no">Adım 3</div><div class="ikon">📚</div>
+    <h3>Ders Yükü ve Birleştirme</h3><p>Satır ekle, düzenle, kopyala, şablon uygula</p>
+  </div>
+  <div class="mkart yesil" id="kart-prog" onclick="programOlusturBaslat()">
+    <div class="no">Adım 4</div><div class="ikon">⚡</div>
+    <h3 id="kp-baslik">Programı Oluştur</h3><p id="kp-alt">OR-Tools CP-SAT ile optimize et</p>
+  </div>
+</div>
+<div class="sure-wrap" style="gap:14px">
+  <button class="sure-btn" id="sb-kolay" onclick="sureSec(30)">
+    🟢 Kolay<br><small style="font-size:9px;opacity:.7">30 saniye</small>
+  </button>
+  <button class="sure-btn" id="sb-orta" onclick="sureSec(180)">
+    🟡 Orta<br><small style="font-size:9px;opacity:.7">3 dakika</small>
+  </button>
+  <button class="sure-btn on" id="sb-zor" onclick="sureSec(300)">
+    🔴 Zor<br><small style="font-size:9px;opacity:.7">5 dakika</small>
+  </button>
+  <button class="sure-btn" id="sb-cokzor" onclick="sureSec(600)">
+    ⚫ Çok Zor<br><small style="font-size:9px;opacity:.7">10 dakika</small>
+  </button>
+  <button class="sure-btn" id="sb-imkansiz" onclick="sureSec(1800)">
+    💀 İmkansız<br><small style="font-size:9px;opacity:.7">30 dakika</small>
+  </button>             
+</div>
+<div class="prog-wrap2 hidden" id="prog-wrap2">
+  <div class="prog-wrap"><div class="prog-bar pulse" id="prog-bar" style="width:0%"></div></div>
+  <div class="sayac" id="sayac">Motor çalışıyor…</div>
+</div>
+<div class="duz-wrap">
+  <button class="btn btn-ghost-orange hidden" id="duz-btn" onclick="git('duzenleme.html')" style="width:480px;max-width:90vw">
+    ✏️ Son Hazırlanan Programı Düzenle (Tıkla-Takasla)
+  </button>
+</div>
+<div id="notif-wrap"></div>
+
+<div class="uyari-bg hidden" id="uyari-modal">
+  <div class="uyari-kutu">
+    <h3>⚠️ Program Oluşturma Uyarıları</h3>
+    <div class="uyari-liste" id="uyari-liste"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('uyari-modal').classList.add('hidden')">❌ İptal</button>
+      <button class="btn btn-orange btn-sm" onclick="uyariOnaylaVeOlustur()">⚡ Yine de Oluştur</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+let _poll=null,_geri=null,_kalan=300;
+let seciliSure=300;
+const e=id=>document.getElementById(id);
+
+// Buton id eşleştirme
+const SURE_BUTON_MAP={30:"sb-kolay",180:"sb-orta",300:"sb-zor",600:"sb-cokzor",1800:"sb-imkansiz"};
+
+function sureSec(sn){
+  seciliSure=sn;
+  document.querySelectorAll(".sure-btn").forEach(b=>b.classList.remove("on"));
+  const bid=SURE_BUTON_MAP[sn];
+  if(bid)e(bid).classList.add("on");
+}
+
+function sureOzelGir(v){
+  const sn=Math.max(5,Math.min(600,parseInt(v)||10));
+  seciliSure=sn;
+  document.querySelectorAll(".sure-btn").forEach(b=>b.classList.remove("on"));
+}
+
+async function sayfaYukle(){
+  const d=await durumYukle();if(!d)return;
+  if(d.program_var)e("duz-btn").classList.remove("hidden");
+  if(!d.ortools_var)e("kp-alt").textContent="Yedek motor (Greedy+Repair)";
+  if(d.motor_calisiyor)motorBekle(seciliSure);
+}
+
+async function programOlusturBaslat(){
+  const d=await durumYukle();
+  if(!d?.df_yuklu){bildir("Önce Excel yükleyin (Adım 1).","uyari");return;}
+  if(d.motor_calisiyor){bildir("Motor zaten çalışıyor.","uyari");return;}
+  let satirlar=[];
+  try{const r=await api.get("/api/ders-yuku");satirlar=r.satirlar||[];}catch(err){}
+  const uyarilar=[];
+  const TOPLAM=40;
+  const snfIzin=d.sinif_izinleri||{};
+  const ogrIzin=d.ogretmen_izinleri||{};
+  const snfSaat={};const ogrSaat={};
+  satirlar.forEach(s=>{
+    const snf=String(s["Sinif"]||s["Sınıf"]||s["sinif"]||"");
+    const ogr=String(s["Ogretmen"]||s["Öğretmen"]||s["ogretmen"]||"");
+    const saat=parseInt(s["Haftalik Saat"]||s["Haftalık Saat"]||s["haftalik_saat"]||0)||0;
+    snf.split("+").forEach(x=>{x=x.trim();if(x&&x!=="nan")snfSaat[x]=(snfSaat[x]||0)+saat;});
+    ogr.split("+").forEach(x=>{x=x.trim();if(x&&x!=="nan")ogrSaat[x]=(ogrSaat[x]||0)+saat;});
+  });
+  (d.sinif_listesi||[]).forEach(snf=>{
+    const kapali=(snfIzin[snf]||[]).length;
+    const bos=TOPLAM-kapali;
+    const atanan=snfSaat[snf]||0;
+    if(atanan>bos)uyarilar.push({tip:"hata",mesaj:`<span class="u-bold">🏫 ${snf}</span> — ${bos} boş saat var, ${atanan} saat atandı → <b>${atanan-bos} saat fazla!</b>`});
+    else if(atanan>0&&atanan<bos)uyarilar.push({tip:"bilgi",mesaj:`<span class="u-bold">🏫 ${snf}</span> — ${bos} boş saat var, ${atanan} saat atandı → ${bos-atanan} saat boş kalacak`});
+  });
+let kilitlerList = [];
+  try { const kl = await api.get("/api/kisitlama/kilitli"); kilitlerList = Object.values(kl.kilitler || {}); } catch(e){}
+
+  (d.ogretmen_listesi||[]).forEach(ogr=>{
+    let kapaliSlotlar = new Set((ogrIzin[ogr]||[]).map(x => `${x[1]}_${x[0]}`));
+    
+    // Öğretmenin kilitli derslerini say
+    let kilitliDersSayisi = 0;
+    kilitlerList.forEach(k => {
+      const ogrEslesiyor = (k.tip === "ogretmen" && k.isim === ogr) || 
+                           (k.tip === "sinif" && k.kilitliOgr && k.kilitliOgr.includes(ogr));
+      if (ogrEslesiyor && k.ders) {
+        kilitliDersSayisi++;
+        kapaliSlotlar.delete(`${k.gun}_${k.saat}`);
+      }
+    });
+
+    const toplamBos = TOPLAM - kapaliSlotlar.size;
+    const kalanDersYuku = (ogrSaat[ogr] || 0) - kilitliDersSayisi;
+    const kalanBosSlot = toplamBos - kilitliDersSayisi;
+
+    // Yalnızca kalan serbest dersler kalan boşluklara sığmıyorsa uyar:
+    if(kalanDersYuku > kalanBosSlot) {
+      uyarilar.push({tip:"hata", mesaj:`<span class="u-bold">👤 ${ogr}</span> — ${kalanBosSlot} boş saat var, ${kalanDersYuku} saat dersi var → <b>${kalanDersYuku - kalanBosSlot} saat fazla!</b>`});
+    }
+  });
+  if(!uyarilar.length){await programOlustur();return;}
+  e("uyari-liste").innerHTML=uyarilar.map(u=>`<div class="u-item ${u.tip}">${u.mesaj}</div>`).join("");
+  e("uyari-modal").classList.remove("hidden");
+}
+
+async function uyariOnaylaVeOlustur(){
+  e("uyari-modal").classList.add("hidden");
+  await programOlustur();
+}
+
+async function programOlustur(){
+  try{await api.post("/api/program/olustur",{sure_saniye:seciliSure});motorBekle(seciliSure);}
+  catch(err){bildir(err.message,"hata");}
+}
+
+function motorBekle(sure){
+  sure=sure||seciliSure||600;
+  e("kart-prog").classList.add("dis","yukleniyor");
+  e("kp-baslik").textContent="⏳ Oluşturuluyor…";
+  e("prog-wrap2").classList.remove("hidden");
+  e("prog-bar").style.width="0%";e("prog-bar").classList.add("pulse");
+  _kalan=sure;
+  if(_geri)clearInterval(_geri);
+  _geri=setInterval(()=>{
+    _kalan=Math.max(0,_kalan-1);
+    const dk=Math.floor(_kalan/60),sn=_kalan%60;
+    e("sayac").textContent="⏱️ Motor çalışıyor… "+dk+":"+String(sn).padStart(2,"0")+" kaldı";
+    e("prog-bar").style.width=Math.min(((sure-_kalan)/sure)*95,95)+"%";
+  },1000);
+  if(_poll)clearInterval(_poll);
+  _poll=setInterval(async()=>{
+    const d=await api.get("/api/program/durum").catch(()=>null);
+    if(!d||d.motor_calisiyor)return;
+    clearInterval(_poll);clearInterval(_geri);
+    e("prog-bar").classList.remove("pulse");e("prog-bar").style.width="100%";
+    e("sayac").textContent="✅ Tamamlandı!";
+    if(d.son_sonuc==="TAMAM"||d.program_var){
+      bildir("Program oluşturuldu! Kalan: "+d.kalan_sayisi+" ders","basari",2500);
+      setTimeout(()=>git("duzenleme.html"),1800);
+    }else if(d.son_sonuc==="HATA"){
+      bildir("Motor hatası: "+(d.hata_mesaji||"").slice(0,200),"hata",10000);
+      e("kart-prog").classList.remove("dis","yukleniyor");
+      e("kp-baslik").textContent="Programı Oluştur";
+      e("prog-wrap2").classList.add("hidden");
+    }
+  },1000);
+}
+
+async function projeKaydet(){
+  try{
+    await api.download("/api/proje/kaydet", null, "proje.enderun");
+    bildir("Proje dosyası indirildi.","basari");
+  }catch(err){bildir(err.message,"hata");}
+}
+
+async function projeYukle(inp){
+  const f=inp.files[0];if(!f)return;
+  try{const r=await api.upload("/api/proje/yukle",f);bildir(r.mesaj,"basari");setTimeout(()=>location.reload(),900);}
+  catch(err){bildir(err.message,"hata");}
+  inp.value="";
+}
+
+function temaDegistir(tema){
+  if(tema==="karanlik") document.documentElement.removeAttribute("data-tema");
+  else document.documentElement.setAttribute("data-tema",tema);
+  localStorage.setItem("akkan-tema",tema);
+  ["karanlik","acik","mavi"].forEach(t=>{
+    const b=document.getElementById("tema-"+t);if(!b)return;
+    b.style.background=t===tema?"var(--card)":"transparent";
+    b.style.color=t===tema?"var(--text)":"var(--muted)";
+  });
+}
+(function(){
+  const t=localStorage.getItem("akkan-tema")||"karanlik";
+  if(t!=="karanlik")document.documentElement.setAttribute("data-tema",t);
+  setTimeout(()=>temaDegistir(t),50);
+})();
+
+sayfaYukle();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Akkan AI — Excel Yükle</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+body{display:flex;flex-direction:column;height:100vh;overflow:hidden; overflow-y:auto;}
+.icerik{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:28px;gap:18px; padding-top:40px;}
+.yukle-alan{border:2.5px dashed var(--border);border-radius:var(--radius);
+  padding:44px 48px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;width:100%;max-width:520px}
+.yukle-alan:hover,.yukle-alan.drag{border-color:var(--blue);background:rgba(142,202,230,.05)}
+.yukle-alan.yuklu{border-color:var(--green);border-style:solid;background:rgba(163,190,140,.05)}
+.yukle-ikon{font-size:48px;margin-bottom:10px}
+.yukle-alan h3{font-size:1.1rem;margin-bottom:6px}
+.yukle-alan p{font-size:12px}
+.format-bilgi{background:rgba(142,202,230,.07);border:1px solid rgba(142,202,230,.2);
+  border-radius:var(--radius-s);padding:11px 16px;font-size:12px;
+  max-width:520px;width:100%;line-height:1.7}
+.format-bilgi b{color:var(--blue)}
+.stat-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stat{background:var(--card);border-radius:var(--radius-s);
+  padding:6px 16px;font-size:12px;border:1px solid var(--border)}
+.stat b{color:var(--blue);margin-right:4px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="btn btn-ghost btn-sm" onclick="git('index.html')">← Ana Menü</button>
+  <h2>📊 Excel Yükle</h2>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost btn-sm" onclick="git('kisitlama.html')">Kısıtlama →</button>
+  <button class="btn btn-green btn-sm" onclick="git('veri.html')">Yönetim →</button>
+</div>
+
+<div class="icerik">
+  <div class="yukle-alan" id="yukle-alan"
+       onclick="document.getElementById('xls-in').click()"
+       ondragover="dragOn(event)" ondragleave="dragOff(event)" ondrop="drop(event)">
+    <div class="yukle-ikon" id="yukle-ikon">📁</div>
+    <h3 id="yukle-h">Excel Dosyasını Yükle</h3>
+    <p id="yukle-p">Tıklayın veya sürükleyip bırakın · .xlsx / .xls</p>
+    <input id="xls-in" type="file" accept=".xlsx,.xls" class="hidden" onchange="excelYukle(this)"/>
+  </div>
+
+  <div class="format-bilgi">
+    <b>Zorunlu sütunlar:</b>
+    <code>Sınıf</code> · <code>Ders Adı</code> · <code>Öğretmen</code> · <code>Haftalık Saat</code><br>
+    <b>Birleşik ders:</b> Sınıf: <code>9A+9B</code> · Öğretmen: <code>Ali Yılmaz+Mehmet Demir</code>
+  </div>
+
+  <div class="stat-bar" id="stat-bar" style="display:none">
+    <div class="stat"><b id="s-satir">0</b>Satır</div>
+    <div class="stat"><b id="s-ogr">0</b>Öğretmen</div>
+    <div class="stat"><b id="s-snf">0</b>Sınıf</div>
+    <div class="stat"><b id="s-ders">0</b>Ders Adı</div>
+  </div>
+</div>
+
+<div id="notif-wrap"></div>
+<script src="assets/app.js"></script>
+<script>
+async function yukle(){
+  const d=await durumYukle()||{};
+  if(d.df_yuklu){
+    setYuklu(`✅ Excel Yüklü — Değiştirmek için tıklayın`,
+             `${d.satir_sayisi||0} satır · ${d.ogretmen_listesi?.length||0} öğretmen · ${d.sinif_listesi?.length||0} sınıf`);
+    goster(d);
+  }
+}
+
+function setYuklu(baslik,alt){
+  document.getElementById("yukle-alan").classList.add("yuklu");
+  document.getElementById("yukle-ikon").textContent="✅";
+  document.getElementById("yukle-h").textContent=baslik;
+  document.getElementById("yukle-p").textContent=alt;
+}
+
+function goster(d){
+  document.getElementById("stat-bar").style.display="flex";
+  document.getElementById("s-satir").textContent=d.satir_sayisi||0;
+  document.getElementById("s-ogr").textContent=d.ogretmen_listesi?.length||0;
+  document.getElementById("s-snf").textContent=d.sinif_listesi?.length||0;
+  document.getElementById("s-ders").textContent=d.ders_listesi?.length||0;
+}
+
+function dragOn(e){e.preventDefault();document.getElementById("yukle-alan").classList.add("drag");}
+function dragOff(){document.getElementById("yukle-alan").classList.remove("drag");}
+function drop(e){e.preventDefault();dragOff();const f=e.dataTransfer.files[0];if(f)yukleIsle(f);}
+function excelYukle(inp){if(inp.files[0])yukleIsle(inp.files[0]);inp.value="";}
+
+async function yukleIsle(f){
+  try{
+    const r=await api.upload("/api/excel-yukle",f);
+    bildir(`✅ ${f.name} yüklendi · ${r.ogretmen_sayisi} öğretmen · ${r.sinif_sayisi} sınıf · ${r.satir_sayisi} satır`,"basari");
+    const d=await durumYukle()||{};
+    setYuklu(`✅ ${f.name} Yüklendi`,`${r.satir_sayisi} satır · ${r.ogretmen_sayisi} öğretmen · ${r.sinif_sayisi} sınıf`);
+    goster({satir_sayisi:r.satir_sayisi,ogretmen_listesi:{length:r.ogretmen_sayisi},
+            sinif_listesi:{length:r.sinif_sayisi},ders_listesi:d.ders_listesi||[]});
+  }catch(err){bildir(err.message,"hata");}
+}
+
+yukle();
+</script>
+</body>
+</html>
